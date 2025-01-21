@@ -1,6 +1,10 @@
+package render
+
+import math.Vec3f
+
 import java.awt.image.BufferedImage
 
-class ColorData(val data: Array[Vec3f], val width: Int, val height: Int) {
+class ColourData(val data: Array[Vec3f], val width: Int, val height: Int) {
   def bufferedImage(): BufferedImage = {
     var img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB) 
 

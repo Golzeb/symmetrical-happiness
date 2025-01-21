@@ -1,9 +1,12 @@
+package math
+
 import scala.annotation.targetName
-import scala.math.sqrt
 import scala.math.Numeric.Implicits.*
+import scala.math.sqrt
 
 class Vec3[T: Numeric] (val x: T, val y: T, val z: T) {
   val length: Double = sqrt(x.toDouble * x.toDouble + y.toDouble * y.toDouble + z.toDouble * z.toDouble)
+  val lengthSquared: T = x * x + y * y * z * z
   def normalized: Vec3d = Vec3(x.toDouble / length, y.toDouble / length, z.toDouble / length)
 
   @targetName("add")
@@ -15,6 +18,8 @@ class Vec3[T: Numeric] (val x: T, val y: T, val z: T) {
 
   @targetName("scale")
   def *(scalar: T): Vec3[T] = Vec3[T](this.x * scalar, this.y * scalar, this.z * scalar)
+  @targetName("mult")
+  def *(other: Vec3[T]): Vec3[T] = Vec3[T](this.x * other.x, this.y * other.y, this.z * other.z)
 
   def toVec3f: Vec3f = Vec3[Float](this.x.toFloat, this.y.toFloat, this.z.toFloat)
 
@@ -27,8 +32,9 @@ extension (f: Float) {
 }
 
 object Vec3 {
-  def zero[T: Numeric]: Vec3[T] = Vec3(0.asInstanceOf[T], 0.asInstanceOf[T], 0.asInstanceOf[T])
-  def one[T: Numeric]: Vec3[T] = Vec3(1.asInstanceOf[T], 1.asInstanceOf[T], 1.asInstanceOf[T])
+  def zero[T](implicit num: Numeric[T]): Vec3[T] = Vec3(num.zero, num.zero, num.zero)
+  def one[T](implicit num: Numeric[T]): Vec3[T] = Vec3(num.one, num.one, num.one)
+  def fill[T: Numeric](v: T): Vec3[T] = Vec3(v, v, v)
 }
 
 type Vec3i = Vec3[Integer]

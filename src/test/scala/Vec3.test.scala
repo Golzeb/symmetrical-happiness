@@ -1,4 +1,6 @@
+import math.Vec3
 import org.scalatest.funsuite.AnyFunSuite
+
 import scala.math.sqrt
 
 

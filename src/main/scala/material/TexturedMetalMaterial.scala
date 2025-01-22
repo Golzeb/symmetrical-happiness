@@ -36,7 +36,7 @@ class TexturedMetalMaterial(albedo: Vec3f, texture: BufferedImage, fuzz: Float =
 
         val uv = a.uv * aMult + b.uv * bMult + c.uv * cMult
 
-        val rgb = texture.getRGB((0.0f.max(uv.x).min(1.0f) * texture.getWidth()).toInt, (0.0f.max(uv.y).min(1.0f) * texture.getHeight()).toInt)
+        val rgb = texture.getRGB((0.0f.max(uv.x).min(1.0f) * (texture.getWidth() - 1)).toInt.min(texture.getWidth), (0.0f.max(uv.y).min(1.0f) * (texture.getHeight() - 1)).toInt)
 
         val (ri, gi, bi) = ((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF)
         val (rf, gf, bf) = (ri.toFloat / 255.0f, gi.toFloat / 255.0f, bi.toFloat / 255.0f)

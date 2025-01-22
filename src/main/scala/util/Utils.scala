@@ -6,7 +6,7 @@ import scala.annotation.targetName
 import scala.math.{abs, pow, sqrt}
 import scala.util.Random
 
-var rand = new Random()
+val rand = new Random()
 
 extension (f: Float) {
   @targetName("scaleVector")
@@ -26,7 +26,7 @@ def calculateArea(a: Vec3f, b: Vec3f, c: Vec3f): Float = {
 }
 
 def randomUnitVector(): Vec3f = {
-  var vector = Vec3[Float](rand.between(-1.0f, 1.0f), rand.between(-1.0f, 1.0f), rand.between(-1.0f, 1.0f))
+  val vector = Vec3[Float](rand.between(-1.0f, 1.0f), rand.between(-1.0f, 1.0f), rand.between(-1.0f, 1.0f))
   vector.normalized.toVec3f
 }
 

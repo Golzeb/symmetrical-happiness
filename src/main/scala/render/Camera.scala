@@ -6,7 +6,7 @@ import util.rand
 import scala.collection.parallel.CollectionConverters.*
 import scala.math.sqrt
 
-class RenderConfig(val samplesPerPixel: Int, val maxBounces: Int)
+class RenderConfig(val samplesPerPixel: Int, val maxBounces: Int, val ambientLight: Vec3f = Vec3.zero[Float])
 
 class Camera(origin: Vec3f, direction: Vec3f, viewportSize: Vec2i, focalLength: Float) {
   def render(objects: Array[Object3D], renderConfig: RenderConfig): ColourData = {
@@ -45,7 +45,7 @@ class Camera(origin: Vec3f, direction: Vec3f, viewportSize: Vec2i, focalLength: 
 
               (Vec3(0.5f, 0.7f, 1.0f) * a) + Vec3(1.0f, 1.0f, 1.0f) * (1.0f - a)
 
-              Vec3.zero[Float]
+              renderConfig.ambientLight
             }
         } else {
           Vec3.one[Float]
@@ -55,26 +55,35 @@ class Camera(origin: Vec3f, direction: Vec3f, viewportSize: Vec2i, focalLength: 
       rec(ray, 0)
     }
 
-    val rays = (for { i <- -halfWidth until halfWidth; j <- -halfHeight until halfHeight }
+    var currentIndex = 0;
+    val data = (for { i <- -halfWidth until halfWidth; j <- -halfHeight until halfHeight }
       yield (i.toFloat, j.toFloat))
       .par
       .map((a: (Float, Float)) => {
         val (x, y) = a
-        generateRays(Vec3(origin.x + aspectRatio * x / halfWidth.toFloat, origin.y + y / (-halfHeight.toFloat), origin.z + direction.z * focalLength))
-      }).toArray
+        val rays = generateRays(Vec3(origin.x + aspectRatio * x / halfWidth.toFloat, origin.y + y / (-halfHeight.toFloat), origin.z + direction.z * focalLength))
+        val out = rays.par.map(ray => getRayColor(ray) * (1.0f / renderConfig.samplesPerPixel)).toList.fold(Vec3.zero[Float])((x, y) => x + y)
 
-    var currentIndex = 0;
+        synchronized{
+          currentIndex += 1;
+          if currentIndex % (viewportSize.x * viewportSize.y / 100) == 0 then println(s"${currentIndex}/${viewportSize.x * viewportSize.y}")
+        }
+        out
+      }).map(x => Vec3(sqrt(x.x), sqrt(x.y), sqrt(x.z)).toVec3f).toArray
 
-    val data = rays.par.map(rays => {
+    println("Rays generated!")
+
+
+    /*val data = rays.par.map(rays => {
 
         val out = rays.par.map(ray => getRayColor(ray) * (1.0f / renderConfig.samplesPerPixel)).toList.fold(Vec3.zero[Float])((x, y) => x + y)
 
         synchronized{
           currentIndex += 1;
-          if currentIndex % (viewportSize.x * viewportSize.y / 10) == 0 then println(s"${currentIndex}/${viewportSize.x * viewportSize.y}")
+          /*if currentIndex % (viewportSize.x * viewportSize.y / 10) == 0 then*/ println(s"${currentIndex}/${viewportSize.x * viewportSize.y}")
         }
         out
-    }).map(x => Vec3(sqrt(x.x), sqrt(x.y), sqrt(x.z)).toVec3f).toArray
+    }).map(x => Vec3(sqrt(x.x), sqrt(x.y), sqrt(x.z)).toVec3f).toArray*/
 
     new ColourData(data, viewportSize.x, viewportSize.y)
   }

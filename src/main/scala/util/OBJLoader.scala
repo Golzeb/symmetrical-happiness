@@ -9,7 +9,7 @@ import java.util.Scanner
 import scala.collection.mutable.ArrayBuffer
 
 object OBJLoader {
-  def loadOBJ(path: String, material: Material = DiffuseMaterial(Vec3.fill(0.8f))): Array[Object3D] = {
+  def loadOBJ(path: String, offset: Vec3f, material: Material = DiffuseMaterial(Vec3.fill(0.8f))): Array[Object3D] = {
     val file = new File(path)
 
     val scanner = new Scanner(file)
@@ -36,9 +36,9 @@ object OBJLoader {
 
           objects.addOne(
             Object3D.Triangle(
-              Vertex(vertices.apply(a), Vec2.zero[Float], Vec3(1.0f, 0.0f, 0.0f)),
-              Vertex(vertices.apply(b), Vec2.zero[Float], Vec3(0.0f, 1.0f, 0.0f)),
-              Vertex(vertices.apply(c), Vec2.zero[Float], Vec3(0.0f, 0.0f, 1.0f)),
+              Vertex(vertices.apply(a) + offset, Vec2.zero[Float], Vec3(1.0f, 0.0f, 0.0f)),
+              Vertex(vertices.apply(b) + offset, Vec2.zero[Float], Vec3(0.0f, 1.0f, 0.0f)),
+              Vertex(vertices.apply(c) + offset, Vec2.zero[Float], Vec3(0.0f, 0.0f, 1.0f)),
               material,
             )
           )
